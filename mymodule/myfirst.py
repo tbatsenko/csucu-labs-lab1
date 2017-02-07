@@ -1,16 +1,13 @@
-"""
-read_field (str) -> (data) що зчитує з файлу ​filename​ поле та записує його у довільний зручний формат data​.
-Ігрове поле у файлі представлене 10 стрічками, що містять символи ​*​ ​— частина корабля, яка ще не потонула,
-​X​ ​—​ частина корабля, яка уже потонула та ​символ пробіл​ — частина поля, що не містить корабля.
-Наприклад, field.txt
-"""
 import doctest
 
 
 def read_field(str):
     """
     (filename) -> (list)
-    Docs
+    Дана функція зчитує з файлу ​filename​ поле та записує його у список списків - data​.
+    Ігрове поле у файлі представлене 10 стрічками, що містять символи ​*​ ​— частина корабля, яка ще не потонула,
+​    X​ ​—​ частина корабля, яка уже потонула та ​символ пробіл​ — частина поля, що не містить корабля.
+    Наприклад, field.txt
     """
     with open(str, 'r', encoding='utf-8', errors='ignore') as field_str:
         content = [list(line.strip('\n')) for line in field_str.readlines()]
@@ -18,7 +15,13 @@ def read_field(str):
 
 def convert_ltr_coord(coord):
     """
-    docs
+    (string) -> (int)
+    Precautions: argument coord MUST contain only one letter from "ABCDEFGHIJ"
+    This function converts coordinate letter to it's index so it can be used as a list index.
+    >>> convert_ltr_coord("A")
+    0
+    >>> convert_ltr_coord("D")
+    3
     """
     letters = "ABCDEFGHIJ"
     return letters.index(coord)
@@ -27,7 +30,7 @@ def convert_ltr_coord(coord):
 def has_ship(data, coords_tuple):
     """
     (data, tuple) -> (bool)
-    Docs
+    This function checks if there is a ship in a given coordinate on a given field.
     """
     return False if data[convert_ltr_coord(coords_tuple[0])][coords_tuple[1]-1] == " " else True
 
@@ -35,7 +38,7 @@ def has_ship(data, coords_tuple):
 def ship_size(data, coords_tuple):
     """-
     (data, tuple) -> (tuple)
-    яка на основі зчитаних даних та координат клітинки
+    Ця функція на основі зчитаних даних та координат клітинки
     (наприклад, (J, 1) або (A, 10)) визначає розмір корабля, частина якого знаходиться у даній клітинці
     >>> ship_size(read_field("field.txt"), ("G", 1))
     4
@@ -59,18 +62,22 @@ def ship_size(data, coords_tuple):
 
 def is_valid(data):
     """
-    is_valid (data) -> (bool) яка перевіряє чи поле зчитане з файлу може бути ігровим полем,
+    is_valid (data) -> (bool) 
+    Дана функція перевіряє чи поле зчитане з файлу може бути ігровим полем,
     на якому розмішені усі кораблі
     check 10x10 +
     check ships:
     - amount
     - ships position
     - ships amount
-
     >>> is_valid([[1], [1,2], [23], [34]])
     False
     """
     def check_ship_position(matrix):
+        """
+        (list) -> (bool)
+        This function checks if the situation of ships is valid according to the Battleship rules.
+        """
         lst = [(1, 1), (1, -1), (-1, 1), (-1, -1)]
         for i in range(len(matrix)):
             for j in range(len(matrix)):
@@ -85,7 +92,8 @@ def is_valid(data):
 
     def check_ships_amount(matrix):
         """
-        Docs
+        (list) -> (bool)
+        This function checks if there is exact amount of ships is valid according to the Battleship rules.
         """
         needed_ships = {1: 4, 2: 3, 3: 2, 4: 1}
         ships = {1: 0, 2: 0, 3: 0, 4: 0}
@@ -119,7 +127,7 @@ def is_valid(data):
 def field_to_str(data):
     """
     (data) -> (str)
-    з обраний вами формат перетворити у стрічку,
+    Дана функція перетворює поле в форматі списоку списків у стрічку,
     що можна буде записати у файл або вивести на екран.
     """
     line = "        -----------------------------------------------------------\n"
@@ -137,30 +145,33 @@ def field_to_str(data):
 
 def generate_field():
     """
-    (None)-> (data)
+    (None) -> (data)
     This function randomly generates a field with the ships for Battleship game.
     """
     import random
     def gen_angle():
         """
-        
-        :return: 
+        (None) -> (str)
+        This function randomly generates a ship angle situation - vertical - in this case function returns "v"
+        or horizontal - in this case function returns "h"
         """
         if random.choice((0,1)) == 0:
             return "h"  # horizontal
         return "v"  # vertical
     def situate_ship(ship_size, free_cells, field):
         """
-        
-        :param ship_size: 
-        :param free_cells: 
-        :return: 
+        (int), (list), (list) -> (list), (list)
+        This function takes a ship size, list of cells available for situation, a field itself and randomly generates
+        a ship position and writes it to the field.
+        Function returns modified list of available cells and a modified field.
         """
         angle = gen_angle()
         if angle == "v":
             free_cells = list(filter(lambda item: item[0] < 11-ship_size, free_cells))
         else:
             free_cells = list(filter(lambda item: item[1] < 11-ship_size, free_cells))
+        if not free_cells:
+            return free_cells, field
         random_coord = random.choice(free_cells)
         if angle == "v":
             for c1 in [-1,0,1]:
@@ -185,30 +196,12 @@ def generate_field():
         availible_cells = [(i, j) for j in range(10) for i in range(10)]
         field = [[" " for c in range(10)] for r in range(10)]
         for num in range(1, 5):
-            
             if num == 1:
-                try:
-                    after_ship = situate_ship(1, availible_cells, field)
-                    availible_cells, field = after_ship[0], after_ship[1]
-                except: 
-                    field = []
-            
+                after_ship = situate_ship(1, availible_cells, field)
             for times in range(5-num):
-                try:
-                    after_ship = situate_ship(num, availible_cells, field)
-                except: 
-                    field = []
-                    availible_cells, field = after_ship[0], after_ship[1]
-                
+                after_ship = situate_ship(num, availible_cells, field)
+                availible_cells, field = after_ship[0], after_ship[1]
         if is_valid(field):
             return field
-print(field_to_str(generate_field()))
 
-
-"""
- ● generate_field () -> (data) яка дозволить згенерувати випадкове поле у вибраному форматі,
-  на якому розміщенні класичні кораблі. Зауважте, що не є правильною стратегія заповнювати ігрове поле кораблями
-   у довільному порядку, оскільки за такого підходу може не залишитися місця для розміщення корабля розміром 1 ✕ 4.
-"""
-
-# doctest.testmod()
+doctest.testmod()
