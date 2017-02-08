@@ -1,17 +1,18 @@
 import doctest
 
 
-def read_field(str):
+def read_field(string):
     """
     (filename) -> (list)
-    Дана функція зчитує з файлу ​filename​ поле та записує його у список списків - data​.
-    Ігрове поле у файлі представлене 10 стрічками, що містять символи ​*​ ​— частина корабля, яка ще не потонула,
-​    X​ ​—​ частина корабля, яка уже потонула та ​символ пробіл​ — частина поля, що не містить корабля.
-    Наприклад, field.txt
+    This function reads from file filename​ a field and writes it to the list of lists (matrix)
+    Game field in file is represented as 10 strings(lines) - ​*​ ​— part of ship, which is not damaged,
+​    X​ ​—​ part of ship, which is damaged, and ' ' - whitespace - free from ship cell.
+    For example, field.txt
     """
-    with open(str, 'r', encoding='utf-8', errors='ignore') as field_str:
+    with open(string, 'r', encoding='utf-8', errors='ignore') as field_str:
         content = [list(line.strip('\n')) for line in field_str.readlines()]
     return content
+
 
 def convert_ltr_coord(coord):
     """
@@ -25,8 +26,8 @@ def convert_ltr_coord(coord):
     """
     letters = "ABCDEFGHIJ"
     return letters.index(coord)
-    
-    
+
+
 def has_ship(data, coords_tuple):
     """
     (data, tuple) -> (bool)
@@ -38,8 +39,8 @@ def has_ship(data, coords_tuple):
 def ship_size(data, coords_tuple):
     """-
     (data, tuple) -> (tuple)
-    Ця функція на основі зчитаних даних та координат клітинки
-    (наприклад, (J, 1) або (A, 10)) визначає розмір корабля, частина якого знаходиться у даній клітинці
+    This functions returns a ship size based on one coord of ship and field with ships
+    (For example, (J, 1) or (A, 10))
     >>> ship_size(read_field("field.txt"), ("G", 1))
     4
     """
@@ -62,9 +63,8 @@ def ship_size(data, coords_tuple):
 
 def is_valid(data):
     """
-    is_valid (data) -> (bool) 
-    Дана функція перевіряє чи поле зчитане з файлу може бути ігровим полем,
-    на якому розмішені усі кораблі
+    is_valid (data) -> (bool)
+    This function checks if the given field is valid for the Battleship game:
     check 10x10 +
     check ships:
     - amount
@@ -124,11 +124,11 @@ def is_valid(data):
         return False
     return True
 
+
 def field_to_str(data):
     """
     (data) -> (str)
-    Дана функція перетворює поле в форматі списоку списків у стрічку,
-    що можна буде записати у файл або вивести на екран.
+    This function converts a field in list of lists format(matrix) to string format
     """
     line = "        -----------------------------------------------------------\n"
     nums_str = "          1     2     3     4     5     6     7     8     9     10     \n"
@@ -149,15 +149,17 @@ def generate_field():
     This function randomly generates a field with the ships for Battleship game.
     """
     import random
+
     def gen_angle():
         """
         (None) -> (str)
         This function randomly generates a ship angle situation - vertical - in this case function returns "v"
         or horizontal - in this case function returns "h"
         """
-        if random.choice((0,1)) == 0:
+        if random.choice((0, 1)) == 0:
             return "h"  # horizontal
         return "v"  # vertical
+
     def situate_ship(ship_size, free_cells, field):
         """
         (int), (list), (list) -> (list), (list)
@@ -175,7 +177,7 @@ def generate_field():
         random_coord = random.choice(free_cells)
         if angle == "v":
             for c1 in [-1,0,1]:
-                for c2 in range(-1,ship_size+1):
+                for c2 in range(-1, ship_size+1):
                     try:
                         free_cells.remove((random_coord[0]+c2, random_coord[1]+c1))
                     except:
